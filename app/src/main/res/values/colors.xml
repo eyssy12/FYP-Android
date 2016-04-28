@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryCardView">#bbc6ff</color>
+    <color name="colorPrimaryViewSelection">#ccebff</color>
+    <color name="colorPrimaryLight">#0098f2</color>
+    <color name="colorPrimary">#0074b9</color>
+    <color name="colorPrimaryDark">#136596</color>
+    <color name="colorAccent">#ff8420</color>
+    <color name="colorCardViewBackground">#d9d9d9</color>
+    <color name="colorRecyclerViewItemOdd">#e6e6e6</color>
+</resources>

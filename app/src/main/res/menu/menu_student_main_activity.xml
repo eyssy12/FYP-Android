@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".activities.MainActivity">
+
+    <item android:id="@+id/send_message_activity"
+          android:title="send message activity"
+          android:orderInCategory="100"
+          app:showAsAction="never"/>
+
+      <item android:id="@+id/reset_shared_preferences"
+            android:title="Reset SharedPrefs"
+            android:orderInCategory="200"
+            app:showAsAction="never"/>
+
+      <item android:id="@+id/register_to_gcm"
+            android:title="Start registration"
+            android:orderInCategory="300"
+            app:showAsAction="never"/>
+
+</menu>
