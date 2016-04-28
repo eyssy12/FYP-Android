@@ -67,6 +67,7 @@ public class StudentTimetableActivity extends AppCompatActivity
 
         Intent passedInArgs = getIntent();
 
+        // test CVS
         if (passedInArgs != null)
         {
             // this means we're arguments from the GcmListenerService
