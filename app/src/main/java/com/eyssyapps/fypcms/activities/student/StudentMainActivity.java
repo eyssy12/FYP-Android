@@ -41,6 +41,7 @@ import com.eyssyapps.fypcms.utils.threading.RunnableUtils;
 import com.eyssyapps.fypcms.utils.view.SystemMessagingUtils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 import butterknife.Bind;
@@ -253,7 +254,18 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
             @Override
             public void onFailure(Call<List<NewsPost>> call, Throwable t)
             {
-                swipeRefreshLayout.setRefreshing(false);
+                if (t instanceof SocketTimeoutException)
+                {
+                    progressDialog.setMessage("API is asleep, retrying...");
+
+                    fetchNews();
+                }
+                else
+                {
+                    swipeRefreshLayout.setRefreshing(false);
+
+                    SystemMessagingUtils.createSnackbar(emptyRecyclerView, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -316,14 +328,17 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
             @Override
             public void onFailure(Call<StudentPerson> call, Throwable t)
             {
-                String message = t.getMessage();
 
-                progressDialog.dismiss();
+                if (t instanceof SocketTimeoutException)
+                {
+                    progressDialog.setMessage("API is asleep, retrying...");
 
-                SystemMessagingUtils.createToast(
-                    StudentMainActivity.this,
-                    message,
-                    Toast.LENGTH_SHORT).show();
+                    fetchNews();
+                }
+                else
+                {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
     }
@@ -468,6 +483,7 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         finish();
     }
 
+    // TODO: remove this once done with the main code
     private void clearSharedPreferences()
     {
         try

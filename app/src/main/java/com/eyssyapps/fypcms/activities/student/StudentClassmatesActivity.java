@@ -128,8 +128,7 @@ public class StudentClassmatesActivity extends AppCompatActivity
 
     private void fetchClassmates()
     {
-        WebApiArguments arguments = RetrofitProviderService.getStandardWebApiArguments(
-                sharedPreferences);
+        WebApiArguments arguments = RetrofitProviderService.getStandardWebApiArguments(sharedPreferences);
 
         Call<List<StudentPerson>> call = classService.getClassmatesForStudent(arguments.getUserId(), arguments.getAuthorizedBearer());
         call.enqueue(new Callback<List<StudentPerson>>() {
@@ -168,10 +167,10 @@ public class StudentClassmatesActivity extends AppCompatActivity
                         @Override
                         public void onFailure(Call<IdTokenResponse> call, Throwable t)
                         {
-                            SystemMessagingUtils.createToast(
-                                    StudentClassmatesActivity.this,
-                                    "There is a problem with the service and requires you to reauthenticate yourself.",
-                                    Toast.LENGTH_SHORT).show();
+                            SystemMessagingUtils.showToast(
+                                StudentClassmatesActivity.this,
+                                "There is a problem with the service and requires you to reauthenticate yourself.",
+                                Toast.LENGTH_SHORT);
 
                             setResult(RESULT_CANCELED);
                             finish();

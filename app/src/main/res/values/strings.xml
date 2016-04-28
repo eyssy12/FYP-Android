@@ -165,4 +165,5 @@
     <string name="title_activity_module_content">ModuleContentActivity</string>
     <string name="title_activity_lecturer_timetable">LecturerTimetableActivity</string>
     <string name="title_activity_lecturer_modules">LecturerModulesActivity</string>
+    <string name="title_activity_timetable_change_info">TimetableChangeInfoActivity</string>
 </resources>

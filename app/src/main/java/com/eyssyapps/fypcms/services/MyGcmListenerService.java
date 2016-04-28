@@ -54,45 +54,13 @@ public class MyGcmListenerService extends GcmListenerService
 
         if (messageType.equals(Protocol.NOTIFICATION))
         {
-            JsonObject timetableChange = json.get(Protocol.TIMETABLE_CHANGE).getAsJsonObject();
-
-            if (timetableChange != null)
+            if (json.has(Protocol.TIMETABLE_CHANGE))
             {
-                JsonArray modifiedEvents = timetableChange.get(Protocol.MODIFIED_EVENTS).getAsJsonArray();
-                int[] modifiedEventIds = JsonUtils.getIntegerArrayFromJsonArray(
-                        modifiedEvents);
-
-                JsonArray newEvents = timetableChange.get(Protocol.NEW_EVENTS).getAsJsonArray();
-                int[] newEventIds = JsonUtils.getIntegerArrayFromJsonArray(newEvents);
-
-                JsonArray removedEvents = timetableChange.get(Protocol.REMOVED_EVENTS).getAsJsonArray();
-                int[] removedEventIds = JsonUtils.getIntegerArrayFromJsonArray(removedEvents);
-
-                Intent intent = new Intent(this, StudentTimetableActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra(Protocol.MODIFIED_EVENTS, modifiedEventIds);
-                intent.putExtra(Protocol.MODIFIED_EVENTS, newEventIds);
-                intent.putExtra(Protocol.MODIFIED_EVENTS, removedEventIds);
-
-                int changeAmount = modifiedEventIds.length + newEventIds.length + removedEventIds.length;
-
-                String message;
-
-                if (changeAmount > 1)
-                {
-                    message = "There are " + changeAmount + " changes made to your timetable.";
-                }
-                else
-                {
-                    message = "There is a single change to your timetable";
-                }
-
-                displayNotification(
-                    "Timetable updated!",
-                    message,
-                    intent,
-                    StudentMainActivity.TIMETABLE_START,
-                    TIMETABLE_NOTIFICATION_ID);
+                handleTimetableChanges(json);
+            }
+            else if (json.has(Protocol.TIMETABLE_CHANGE_CANCELLED_EVENTS))
+            {
+                handleTimetableEventCancelations(json);
             }
         }
         else
@@ -132,5 +100,76 @@ public class MyGcmListenerService extends GcmListenerService
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(notificationID, notificationBuilder.build());
+    }
+
+    protected void handleTimetableChanges(JsonObject json)
+    {
+        JsonObject timetableChange = json.get(Protocol.TIMETABLE_CHANGE).getAsJsonObject();
+
+        JsonArray modifiedEvents = timetableChange.get(Protocol.MODIFIED_EVENTS).getAsJsonArray();
+        int[] modifiedEventIds = JsonUtils.getIntegerArrayFromJsonArray(
+                modifiedEvents);
+
+        JsonArray newEvents = timetableChange.get(Protocol.NEW_EVENTS).getAsJsonArray();
+        int[] newEventIds = JsonUtils.getIntegerArrayFromJsonArray(newEvents);
+
+        JsonArray removedEvents = timetableChange.get(Protocol.REMOVED_EVENTS).getAsJsonArray();
+        int[] removedEventIds = JsonUtils.getIntegerArrayFromJsonArray(removedEvents);
+
+        Intent intent = new Intent(this, StudentTimetableActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(Protocol.STANDARD_EVENT_CHANGE, true);
+        intent.putExtra(Protocol.MODIFIED_EVENTS, modifiedEventIds);
+        intent.putExtra(Protocol.NEW_EVENTS, newEventIds);
+        intent.putExtra(Protocol.REMOVED_EVENTS, removedEventIds);
+
+        int changeAmount = modifiedEventIds.length + newEventIds.length + removedEventIds.length;
+
+        String message;
+
+        if (changeAmount > 1)
+        {
+            message = "There are " + changeAmount + " changes made to your timetable!";
+        }
+        else
+        {
+            message = "There is a single change to your timetable!";
+        }
+
+        displayNotification(
+                "Timetable updated",
+                message,
+                intent,
+                StudentMainActivity.TIMETABLE_START,
+                TIMETABLE_NOTIFICATION_ID);
+    }
+
+    protected void handleTimetableEventCancelations(JsonObject json)
+    {
+        JsonObject changes = json.get(Protocol.TIMETABLE_CHANGE_CANCELLED_EVENTS).getAsJsonObject();
+
+        JsonArray cancelledEvents = changes.get(Protocol.CANCELLED_EVENTS).getAsJsonArray();
+        int[] cancelledEventIds = JsonUtils.getIntegerArrayFromJsonArray(cancelledEvents);
+
+        String message;
+        if (cancelledEventIds.length > 1)
+        {
+            message = "More than one class has been cancelled!";
+        }
+        else
+        {
+            message = "A class has been cancelled!";
+        }
+
+        Intent intent = new Intent(this, StudentTimetableActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(Protocol.CANCELLED_EVENTS, cancelledEventIds);
+
+        displayNotification(
+            "Timetable changes",
+            message,
+            intent,
+            StudentMainActivity.TIMETABLE_START,
+            TIMETABLE_NOTIFICATION_ID);
     }
 }

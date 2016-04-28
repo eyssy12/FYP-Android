@@ -11,7 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.eyssyapps.fypcms.Protocol;
 import com.eyssyapps.fypcms.R;
+import com.eyssyapps.fypcms.activities.common.TimetableChangeInfoActivity;
 import com.eyssyapps.fypcms.custom.TabbedWeekViewPager;
 import com.eyssyapps.fypcms.managers.PreferencesManager;
 import com.eyssyapps.fypcms.models.IdTokenResponse;
@@ -41,6 +43,10 @@ public class StudentTimetableActivity extends AppCompatActivity
 
     private Timetable timetable;
     private TabbedWeekViewPager tabbedWeekViewPager;
+    private int[] cancelledEventsIds,
+        newEventIds,
+        modifiedEventIds,
+        removedEventIds;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -65,12 +71,21 @@ public class StudentTimetableActivity extends AppCompatActivity
         progressDialog.setMessage("Preparing timetable...");
         progressDialog.show();
 
-        Intent passedInArgs = getIntent();
+        // this means we're arguments from the GcmListenerService
+        Bundle extras = getIntent().getExtras();
 
-        // test CVS
-        if (passedInArgs != null)
+        if (extras != null)
         {
-            // this means we're arguments from the GcmListenerService
+            if (extras.containsKey(Protocol.CANCELLED_EVENTS))
+            {
+                cancelledEventsIds = extras.getIntArray(Protocol.CANCELLED_EVENTS);
+            }
+            else if (extras.containsKey(Protocol.STANDARD_EVENT_CHANGE))
+            {
+                newEventIds = extras.getIntArray(Protocol.NEW_EVENTS);
+                modifiedEventIds = extras.getIntArray(Protocol.MODIFIED_EVENTS);
+                removedEventIds = extras.getIntArray(Protocol.REMOVED_EVENTS);
+            }
         }
 
         sharedPreferences = PreferencesManager.getInstance(StudentTimetableActivity.this);
@@ -87,16 +102,14 @@ public class StudentTimetableActivity extends AppCompatActivity
         if (RetrofitProviderService.isTokenExpired(sharedPreferences))
         {
             String accessToken = sharedPreferences.getStringWithDefault(PreferencesManager.PREFS_DATA_ACCESS_TOKEN);
-            Call<IdTokenResponse> call = authService.refreshIdtoken(new RefreshTokenRequest(
-                    accessToken));
 
+            Call<IdTokenResponse> call = authService.refreshIdtoken(new RefreshTokenRequest(accessToken));
             call.enqueue(new Callback<IdTokenResponse>()
             {
                 @Override
                 public void onResponse(Call<IdTokenResponse> call, Response<IdTokenResponse> response)
                 {
-                    RetrofitProviderService.replaceIdTokenWithLatest(sharedPreferences,
-                            response.body());
+                    RetrofitProviderService.replaceIdTokenWithLatest(sharedPreferences, response.body());
 
                     fetchTimetable();
                 }
@@ -204,7 +217,9 @@ public class StudentTimetableActivity extends AppCompatActivity
                 progressDialog.show();
                 fetchTimetable();
                 break;
-
+            case R.id.action_cancellations:
+                showCancellations();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -222,5 +237,19 @@ public class StudentTimetableActivity extends AppCompatActivity
         setResult(RESULT_OK, intent);
 
         finish();
+    }
+
+    private void showCancellations()
+    {
+        if (cancelledEventsIds == null || cancelledEventsIds.length < 1)
+        {
+            SystemMessagingUtils.showToast(this, "No changes to show", Toast.LENGTH_SHORT);
+        }
+        else
+        {
+            Intent intent = new Intent(this, TimetableChangeInfoActivity.class);
+
+            startActivity(intent);
+        }
     }
 }
