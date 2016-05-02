@@ -16,14 +16,6 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
 
-    <TextView
-        android:id="@+id/empty_recycler_view_state"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="gone"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="48dp"
-        android:text="No news to display"/>
+    <include android:id="@+id/empty_recycler_view_state_layout" layout="@layout/empty_recycler_view_state_layout"/>
 
 </android.support.v4.widget.SwipeRefreshLayout>

@@ -9,10 +9,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.LayoutInflater;
 import android.widget.EditText;
 
 import com.eyssyapps.fypcms.adapters.EventRecyclerViewAdapter;
 import com.eyssyapps.fypcms.custom.EmptyRecyclerView;
+import com.eyssyapps.fypcms.enumerations.TimetableType;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.io.IOException;
@@ -81,7 +83,7 @@ public class ViewUtils
         return new BitmapDrawable(x);
     }
 
-    public static Pair<EmptyRecyclerView, EventRecyclerViewAdapter> createRecyclerViewAdapterPair(Context context)
+    public static Pair<EmptyRecyclerView, EventRecyclerViewAdapter> createRecyclerViewAdapterPair(Context context, LayoutInflater inflater, TimetableType timetableType)
     {
         EmptyRecyclerView emptyRecyclerView = new EmptyRecyclerView(context);
 
@@ -90,7 +92,10 @@ public class ViewUtils
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         emptyRecyclerView.setLayoutManager(layoutManager);
 
-        EventRecyclerViewAdapter adapter = new EventRecyclerViewAdapter(context, emptyRecyclerView);
+        // View view = inflater.inflate(R.layout.empty_recycler_view_state_layout, null);
+
+        EventRecyclerViewAdapter adapter = new EventRecyclerViewAdapter(context, emptyRecyclerView, timetableType);
+        // emptyRecyclerView.setEmptyView(view);
         emptyRecyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(context).build());
         emptyRecyclerView.setVerticalScrollBarEnabled(true);
         emptyRecyclerView.setAdapter(adapter);

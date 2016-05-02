@@ -15,6 +15,7 @@ import com.eyssyapps.fypcms.Protocol;
 import com.eyssyapps.fypcms.R;
 import com.eyssyapps.fypcms.activities.common.TimetableChangeInfoActivity;
 import com.eyssyapps.fypcms.custom.TabbedWeekViewPager;
+import com.eyssyapps.fypcms.enumerations.TimetableType;
 import com.eyssyapps.fypcms.managers.PreferencesManager;
 import com.eyssyapps.fypcms.models.IdTokenResponse;
 import com.eyssyapps.fypcms.models.RefreshTokenRequest;
@@ -65,7 +66,7 @@ public class StudentTimetableActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        progressDialog = new ProgressDialog(StudentTimetableActivity.this);
+        progressDialog = new ProgressDialog(this);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("Preparing timetable...");
@@ -88,12 +89,12 @@ public class StudentTimetableActivity extends AppCompatActivity
             }
         }
 
-        sharedPreferences = PreferencesManager.getInstance(StudentTimetableActivity.this);
+        sharedPreferences = PreferencesManager.getInstance(this);
         retrofit = RetrofitProviderService.getDefaultInstance();
         authService = retrofit.create(AuthService.class);
         timetableService = retrofit.create(TimetableService.class);
 
-        tabbedWeekViewPager = new TabbedWeekViewPager(StudentTimetableActivity.this, coordinatorLayout);
+        tabbedWeekViewPager = new TabbedWeekViewPager(this, coordinatorLayout, TimetableType.STUDENT);
         this.checkToken();
     }
 

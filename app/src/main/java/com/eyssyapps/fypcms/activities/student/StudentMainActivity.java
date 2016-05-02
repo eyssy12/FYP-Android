@@ -86,6 +86,8 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
     private PreferencesManager sharedPreferences;
     private GoogleCloudMessaging gcm;
 
+    private boolean initialLoadFinished = false, studentLoaded = false, newsLoaded = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -136,6 +138,8 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         emptyRecyclerView = (EmptyRecyclerView)swipeRefreshLayout.findViewById(R.id.recycler_view_empty_support);
         emptyRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         newsPostAdapter = new NewsRecyclerViewAdapter(this, emptyRecyclerView);
+
+        emptyRecyclerView.setEmptyView(swipeRefreshLayout.findViewById(R.id.empty_recycler_view_state_layout));
         emptyRecyclerView.setAdapter(newsPostAdapter);
 
         navigationView.setNavigationItemSelectedListener(StudentMainActivity.this);
@@ -222,6 +226,8 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
                     }
 
                     swipeRefreshLayout.setRefreshing(false);
+
+                    reportNewsLoaded();
                 }
                 else if (RetrofitProviderService.checkNewTokenRequired(response))
                 {
@@ -290,12 +296,8 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
                     student = response.body();
 
                     nameText.setText(student.getPerson().getFullName());
-                    progressDialog.dismiss();
 
-                    SystemMessagingUtils.showSnackBar(
-                            emptyRecyclerView,
-                            "Data loaded",
-                            Toast.LENGTH_SHORT);
+                    reportStudentLoaded();
                 }
                 else if (RetrofitProviderService.checkNewTokenRequired(response))
                 {
@@ -495,6 +497,35 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         catch (Exception ex)
         {
             Toast.makeText(StudentMainActivity.this, "Couldnt clear shared preferences", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void reportNewsLoaded()
+    {
+        newsLoaded = true;
+
+        checkLoadingStatus();
+    }
+
+    private void reportStudentLoaded()
+    {
+        studentLoaded = true;
+
+        checkLoadingStatus();
+    }
+
+    private void checkLoadingStatus()
+    {
+        if (!initialLoadFinished && (studentLoaded && newsLoaded))
+        {
+            progressDialog.dismiss();
+
+            SystemMessagingUtils.showSnackBar(
+                emptyRecyclerView,
+                "Data loaded",
+                Toast.LENGTH_SHORT);
+
+            initialLoadFinished = true;
         }
     }
 }

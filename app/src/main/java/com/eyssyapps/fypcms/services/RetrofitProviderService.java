@@ -119,10 +119,8 @@ public class RetrofitProviderService
 
     public static WebApiArguments getStandardWebApiArguments(PreferencesManager sharedPreferences)
     {
+        int userId = Integer.parseInt(sharedPreferences.getStringWithDefault(PreferencesManager.PREFS_DATA_USER_ID));
         String token = sharedPreferences.getStringWithDefault(PreferencesManager.PREFS_DATA_ID_TOKEN);
-
-        String userIdString = sharedPreferences.getStringWithDefault(PreferencesManager.PREFS_DATA_USER_ID);
-        int userId = Integer.parseInt(userIdString);
 
         return new WebApiArguments(userId, token);
     }
@@ -139,6 +137,6 @@ public class RetrofitProviderService
 
     public static boolean checkNotFound(Response<?> response)
     {
-        return  response.raw().code() == HttpURLConnection.HTTP_NOT_FOUND;
+        return response.raw().code() == HttpURLConnection.HTTP_NOT_FOUND;
     }
 }

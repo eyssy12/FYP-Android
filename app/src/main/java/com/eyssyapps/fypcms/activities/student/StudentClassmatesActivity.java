@@ -78,6 +78,7 @@ public class StudentClassmatesActivity extends AppCompatActivity
         emptyRecyclerView = (EmptyRecyclerView)swipeRefreshLayout.findViewById(R.id.recycler_view_empty_support);
         emptyRecyclerView.setLayoutManager(new LinearLayoutManager(StudentClassmatesActivity.this));
         classmatesAdapter = new ClassmatesRecyclerViewAdapter(StudentClassmatesActivity.this, emptyRecyclerView);
+        emptyRecyclerView.setEmptyView(swipeRefreshLayout.findViewById(R.id.empty_recycler_view_state_layout));
         emptyRecyclerView.setAdapter(classmatesAdapter);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

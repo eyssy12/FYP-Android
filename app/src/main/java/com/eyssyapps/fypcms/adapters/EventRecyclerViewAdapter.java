@@ -1,15 +1,18 @@
 package com.eyssyapps.fypcms.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.eyssyapps.fypcms.R;
+import com.eyssyapps.fypcms.enumerations.TimetableType;
 import com.eyssyapps.fypcms.models.Event;
+import com.eyssyapps.fypcms.models.viewholders.EventItemViewHolder;
 import com.eyssyapps.fypcms.utils.Constants;
+import com.eyssyapps.fypcms.utils.view.SystemMessagingUtils;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -20,70 +23,25 @@ import java.util.List;
 /**
  * Created by eyssy on 08/04/2016.
  */
-public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.EventItemViewHolder>
+public class EventRecyclerViewAdapter extends RecyclerViewAdapterBase<Event, EventItemViewHolder>
 {
-    private Context context;
-    private LayoutInflater inflater;
-    private LinkedList<Event> items;
-    private final View parentView;
+    private TimetableType timetableType;
 
-    private int selectedPosition = -1;
-    private Object mutex;
-
-    public EventRecyclerViewAdapter(Context context, View parentView)
+    public EventRecyclerViewAdapter(Context context, View parentView, TimetableType timetableType)
     {
-        this.context = context;
-        this.items = new LinkedList<>();
-        this.inflater = LayoutInflater.from(context);
-        this.parentView = parentView;
+        super(context, parentView);
 
-        this.mutex = new Object();
+        this.timetableType = timetableType;
     }
 
-    public View getParentView()
-    {
-        return this.parentView;
-    }
-
-    public boolean addAtPosition(Event item, int position)
-    {
-        if (items.contains(item) || position > items.size())
-        {
-            return false;
-        }
-
-        items.add(position, item);
-        refresh();
-
-        return true;
-    }
-
-    public boolean add(Event item)
-    {
-        if (items.contains(item))
-        {
-            return false;
-        }
-
-        items.addFirst(item);
-        refresh();
-
-        return true;
-    }
-
-    public void addNewCollection(List<Event> collection, boolean immediateRefresh)
-    {
-        items.clear();
-        addCollection(collection, immediateRefresh);
-    }
-
-    public void replaceCollection(List<Event> newCollection, boolean immediateRefresh)
+    @Override
+    public void replaceCollection(List<Event> collection, boolean immediateRefresh)
     {
         synchronized (mutex)
         {
-            if (!newCollection.isEmpty())
+            if (!collection.isEmpty())
             {
-                items = new LinkedList<>(newCollection);
+                items = new LinkedList<>(collection);
                 Collections.sort(items);
             }
         }
@@ -92,48 +50,6 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         {
             refresh();
         }
-    }
-
-    public void addCollection(List<Event> collection, boolean immediateRefresh)
-    {
-        synchronized (mutex)
-        {
-            if (!collection.isEmpty())
-            {
-                for (Event event : collection)
-                {
-                    items.addFirst(event);
-                }
-            }
-        }
-
-        if (immediateRefresh)
-        {
-            refresh();
-        }
-    }
-
-    public void clear()
-    {
-        items.clear();
-        refresh();
-    }
-
-    public boolean remove(String item)
-    {
-        if (items.contains(item))
-        {
-            items.remove(item);
-            refresh();
-            return true;
-        }
-
-        return false;
-    }
-
-    public void refresh()
-    {
-        notifyDataSetChanged();
     }
 
     @Override
@@ -165,32 +81,49 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
             String formatted = startFormatted + " - " + endFormatted;
 
-            holder.eventNameText.setText(item.getTitle());
-            holder.eventTimeText.setText(formatted);
+            holder.getEventNameText().setText(item.getTitle());
+            holder.getEventTimeText().setText(formatted);
+
+            if (timetableType == TimetableType.LECTURER)
+            {
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        String[] items = new String[] {"Cancel", "Modify" };
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder
+                            .setTitle("Choose action for selected event")
+                            .setItems(items, new DialogInterface.OnClickListener() {
+                               public void onClick(DialogInterface dialog, int which)
+                               {
+                                   if (which == 0)
+                                   {
+                                       SystemMessagingUtils.showToast(context, "Cancelled " + item.getId(), Toast.LENGTH_SHORT);
+                                   }
+                                   else if (which == 1)
+                                   {
+                                       SystemMessagingUtils.showToast(context, "Not supported in v1.0", Toast.LENGTH_SHORT);
+                                   }
+                               }
+                            })
+                            .setNegativeButton("Dismiss", new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .create()
+                            .show();
+                    }
+                });
+            }
         }
         catch (ParseException e)
         {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public int getItemCount()
-    {
-        return items.size();
-    }
-
-    class EventItemViewHolder extends RecyclerView.ViewHolder
-    {
-        TextView eventNameText,
-            eventTimeText;
-
-        public EventItemViewHolder(View itemView)
-        {
-            super(itemView);
-
-            eventNameText = (TextView) itemView.findViewById(R.id.eventNameText);
-            eventTimeText = (TextView) itemView.findViewById(R.id.eventTimeText);
         }
     }
 }

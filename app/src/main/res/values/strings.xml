@@ -5,10 +5,17 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_student_main">StudentMainActivity</string>
-    <string name="title_activity_lecturer_main">LecturerMainActivity</string>
+    <string name="title_activity_lecturer_main">Latest News</string>
     <string name="reauthenticationg_required">There is a problem with the service and requires you to re-authenticate yourself.</string>
     <string name="latest_news">Latest News</string>
-    <string name="title_activity_classmates">ClassmatesActivity</string>
+    <string name="title_activity_classmates">Classmates</string>
+    <string name="title_activity_modules">Modules</string>
+    <string name="title_activity_timetable">Timetable</string>
+    <string name="title_activity_student_timetable">Timetable</string>
+    <string name="title_activity_student_modules">Modules</string>
+    <string name="title_activity_lecturer_timetable">Timetable</string>
+    <string name="title_activity_lecturer_modules">Modules</string>
+    <string name="title_activity_timetable_change_info">Event Changes</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -98,8 +105,7 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
-    <string name="title_activity_modules">ModulesActivity</string>
-    <string name="title_activity_timetable">TimetableActivity</string>
+
     <string name="title_activity_student_account_settings">Account Settings</string>
 
     <!-- Strings related to Settings -->
@@ -129,7 +135,6 @@
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
-
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>
@@ -149,21 +154,10 @@
     </string-array>
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifications</string>
-
     <string name="pref_title_new_message_notifications">New message notifications</string>
-
     <string name="pref_title_ringtone">Ringtone</string>
     <string name="pref_ringtone_silent">Silent</string>
-
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="title_activity_student_timetable">Timetable</string>
-    <string name="title_activity_student_modules">Modules</string>
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="title_activity_module_content">ModuleContentActivity</string>
-    <string name="title_activity_lecturer_timetable">LecturerTimetableActivity</string>
-    <string name="title_activity_lecturer_modules">LecturerModulesActivity</string>
-    <string name="title_activity_timetable_change_info">TimetableChangeInfoActivity</string>
 </resources>

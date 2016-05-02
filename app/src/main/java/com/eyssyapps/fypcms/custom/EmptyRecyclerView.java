@@ -11,6 +11,8 @@ import android.view.View;
  */
 public class EmptyRecyclerView extends RecyclerView
 {
+    private String tag;
+
     private View emptyView;
     final private AdapterDataObserver observer = new AdapterDataObserver()
     {
@@ -38,6 +40,13 @@ public class EmptyRecyclerView extends RecyclerView
         super(context);
     }
 
+    public EmptyRecyclerView(Context context, String tag)
+    {
+        super(context);
+
+        this.tag = tag;
+    }
+
     public EmptyRecyclerView(Context context, AttributeSet attrs)
     {
         super(context, attrs);
@@ -55,6 +64,11 @@ public class EmptyRecyclerView extends RecyclerView
             final boolean emptyViewVisible = getAdapter().getItemCount() == 0;
             emptyView.setVisibility(emptyViewVisible ? VISIBLE : GONE);
             setVisibility(emptyViewVisible ? GONE : VISIBLE);
+
+//            Log.d(tag, "-----------------");
+//            Log.d(tag, "emptyViewVisible: " + (emptyViewVisible ? VISIBLE : GONE));
+//            Log.d(tag, "adapterVisible: " + (emptyViewVisible ? GONE : VISIBLE));
+//            Log.d(tag, "-----------------");
         }
     }
 

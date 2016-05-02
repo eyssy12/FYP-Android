@@ -70,7 +70,9 @@ public class LecturerMainActivity extends AppCompatActivity implements Navigatio
     private NewsRecyclerViewAdapter newsPostAdapter;
     private ProgressDialog progressDialog;
 
-    private boolean initialNewsLoaded = false, initialLecturerLoaded = false;
+    private boolean initialLoadFinished = false,
+            initialNewsLoaded = false,
+            initialLecturerLoaded = false;
 
     @Bind (R.id.toolbar)
     Toolbar toolbar;
@@ -93,6 +95,7 @@ public class LecturerMainActivity extends AppCompatActivity implements Navigatio
 
         ButterKnife.bind(this);
 
+        toolbar.setElevation(50);
         setSupportActionBar(toolbar);
 
         progressDialog = new ProgressDialog(LecturerMainActivity.this);
@@ -423,11 +426,13 @@ public class LecturerMainActivity extends AppCompatActivity implements Navigatio
 
     private void checkIsEverythingLoaded()
     {
-        if (initialLecturerLoaded && initialNewsLoaded)
+        if (!initialLoadFinished && (initialLecturerLoaded && initialNewsLoaded))
         {
             progressDialog.dismiss();
 
-            SystemMessagingUtils.createSnackbar(emptyRecyclerView, "Data loaded", Snackbar.LENGTH_SHORT).show();
+            SystemMessagingUtils.showSnackBar(emptyRecyclerView, "Data loaded", Snackbar.LENGTH_SHORT);
+
+            initialLoadFinished = true;
         }
     }
 

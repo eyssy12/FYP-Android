@@ -2,8 +2,6 @@ package com.eyssyapps.fypcms.adapters;
 
 import android.content.Context;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -12,118 +10,14 @@ import com.eyssyapps.fypcms.models.NewsPost;
 import com.eyssyapps.fypcms.models.viewholders.NewsItemViewHolder;
 import com.eyssyapps.fypcms.utils.view.SystemMessagingUtils;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Created by eyssy on 06/04/2016.
  */
-public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsItemViewHolder>
+public class NewsRecyclerViewAdapter extends RecyclerViewAdapterBase<NewsPost, NewsItemViewHolder>
 {
-    // TODO: separate out this common code for all the adapters into a base class
-    private Context context;
-    private LayoutInflater inflater;
-    private LinkedList<NewsPost> items;
-    private final View parentView;
-
-    private Object mutex;
-
     public NewsRecyclerViewAdapter(Context context, View parentView)
     {
-        this.context = context;
-        this.items = new LinkedList<>();
-        this.inflater = LayoutInflater.from(context);
-        this.parentView = parentView;
-
-        this.mutex = new Object();
-    }
-
-    public boolean addAtPosition(NewsPost item, int position)
-    {
-        if (items.contains(item) || position > items.size())
-        {
-            return false;
-        }
-
-        items.add(position, item);
-        refresh();
-
-        return true;
-    }
-
-    public boolean add(NewsPost item)
-    {
-        if (items.contains(item))
-        {
-            return false;
-        }
-
-        items.addFirst(item);
-        refresh();
-
-        return true;
-    }
-
-    public void addNewCollection(List<NewsPost> collection, boolean immediateRefresh)
-    {
-        items.clear();
-        addCollection(collection, immediateRefresh);
-    }
-
-    public void addCollection(List<NewsPost> collection, boolean immediateRefresh)
-    {
-        synchronized (mutex)
-        {
-            for (NewsPost newsPost : collection)
-            {
-                items.addFirst(newsPost);
-            }
-        }
-
-        if (immediateRefresh)
-        {
-            refresh();
-        }
-    }
-
-    public void replaceCollection(List<NewsPost> newCollection, boolean immediateRefresh)
-    {
-        // TODO: might need to order this by timestamp
-        synchronized (mutex)
-        {
-            if (!newCollection.isEmpty())
-            {
-                items = new LinkedList<>(newCollection);
-            }
-        }
-
-        if (immediateRefresh)
-        {
-            refresh();
-        }
-    }
-
-    public void clear()
-    {
-        items.clear();
-        refresh();
-    }
-
-    public boolean remove(String item)
-    {
-        if (items.contains(item))
-        {
-            items.remove(item);
-            refresh();
-            return true;
-        }
-
-        return false;
-    }
-
-    public void refresh()
-    {
-        notifyDataSetChanged();
+        super(context, parentView);
     }
 
     @Override
@@ -160,11 +54,5 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsItemViewHo
                 SystemMessagingUtils.showSnackBar(parentView, "webview", Snackbar.LENGTH_SHORT);
             }
         });
-    }
-
-    @Override
-    public int getItemCount()
-    {
-        return items.size();
     }
 }

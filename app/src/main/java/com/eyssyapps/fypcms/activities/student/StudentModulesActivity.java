@@ -78,6 +78,7 @@ public class StudentModulesActivity extends AppCompatActivity
         emptyRecyclerView = (EmptyRecyclerView)swipeRefreshLayout.findViewById(R.id.recycler_view_empty_support);
         emptyRecyclerView.setLayoutManager(new LinearLayoutManager(StudentModulesActivity.this));
         modulesAdapter = new ModulesRecyclerViewAdapter(StudentModulesActivity.this, emptyRecyclerView);
+        emptyRecyclerView.setEmptyView(swipeRefreshLayout.findViewById(R.id.empty_recycler_view_state_layout));
         emptyRecyclerView.setAdapter(modulesAdapter);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

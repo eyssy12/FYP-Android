@@ -21,14 +21,9 @@ public class NewsItemViewHolder extends RecyclerView.ViewHolder
     {
         super(itemView);
 
-        // bodyText = (TextView) itemView.findViewById(R.id.newspost_body);
-        //bodyText.setVisibility(View.GONE);
-
         titleText = (TextView) itemView.findViewById(R.id.newspost_title);
         timestampText = (TextView) itemView.findViewById(R.id.newspost_timestamp);
         postedByText = (TextView) itemView.findViewById(R.id.newspost_postedBy);
-
-
 
         webView = (WebView)itemView.findViewById(R.id.newspost_webview_body);
 
