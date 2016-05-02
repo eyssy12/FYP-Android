@@ -41,12 +41,51 @@ public class MyGcmListenerService extends GcmListenerService
     {
         Log.d(TAG, "From: " + from);
 
-        String contents = data.getString(Protocol.CONTENTS);
-
-        if (contents == null || contents.isEmpty())
+        if (isHttpMessage(data))
         {
-            return;
+            handleHttpMessage(data);
         }
+        else
+        {
+            handleXmppMessage(data);
+        }
+    }
+
+    private boolean isHttpMessage(Bundle data)
+    {
+        return data.containsKey(Protocol.CONTENTS);
+    }
+
+    private void handleXmppMessage(Bundle data)
+    {
+        String action = data.getString(Protocol.ACTION);
+
+        if (action.equals(Protocol.EVENT_CANCELLED))
+        {
+            int eventId = Integer.valueOf(data.getString(Protocol.VALUE));
+            String timestamp = data.getString(Protocol.TIMESTAMP);
+            String cancelledBy = data.getString(Protocol.CANCELLED_BY);
+            String message = "A class has been cancelled!";
+
+            Intent intent = new Intent(this, StudentTimetableActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra(Protocol.STANDARD_EVENT_CHANGE, false);
+            intent.putExtra(Protocol.CANCELLED_EVENTS, new int[] { eventId });
+            intent.putExtra(Protocol.TIMESTAMP, timestamp);
+            intent.putExtra(Protocol.CANCELLED_BY, cancelledBy);
+
+            displayNotification(
+                "Timetable updated",
+                message,
+                intent,
+                StudentMainActivity.TIMETABLE_START,
+                TIMETABLE_NOTIFICATION_ID);
+        }
+    }
+
+    private void handleHttpMessage(Bundle data)
+    {
+        String contents = data.getString(Protocol.CONTENTS);
 
         JsonObject json = JsonUtils.asJsonObject(contents);
 

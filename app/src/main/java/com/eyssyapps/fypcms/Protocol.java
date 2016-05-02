@@ -10,6 +10,7 @@ public class Protocol
         NOTIFICATION = "notification",
         AUTHENTICATED = "authenticated",
         CONTENTS = "contents",
+        DATA = "data",
         STUDENT = "student",
         LECTURER = "lecturer",
         ACTION = "action",
@@ -18,8 +19,10 @@ public class Protocol
         REGISTRATION = "registration",
         REREGISTRATION = "reregistration",
         MESSAGE = "message",
+        TIMESTAMP = "timestamp",
         TIMETABLE_CHANGE = "timetable_change",
         TIMETABLE_CHANGE_CANCELLED_EVENTS = "timetable_change_cancelled_events",
+        TIMETABLE_CHANGE_CANCELLED_EVENT_ID = "timetable_change_cancelled_event_id",
         CCS_SERVER_ENDPOINT_ADDRESS = "@gcm.googleapis.com",
         SENDER_ID = "334770348820",
         PROJECT_ID = "fyp-cms-college",
@@ -30,5 +33,7 @@ public class Protocol
         NEW_EVENTS = "new_events",
         REMOVED_EVENTS = "removed_events",
         CANCELLED_EVENTS = "cancelled_event_ids",
+        EVENT_CANCELLED = "event_cancelled",
+        CANCELLED_BY = "cancelled_by",
         STANDARD_EVENT_CHANGE = "standard_event_change";
 }

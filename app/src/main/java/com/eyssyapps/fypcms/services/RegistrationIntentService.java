@@ -11,10 +11,10 @@ import com.eyssyapps.fypcms.Protocol;
 import com.eyssyapps.fypcms.R;
 import com.eyssyapps.fypcms.managers.PreferencesManager;
 import com.eyssyapps.fypcms.utils.Constants;
+import com.eyssyapps.fypcms.utils.networking.GcmUtils;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
-import java.io.IOException;
 import java.util.Random;
 
 public class RegistrationIntentService extends IntentService
@@ -146,15 +146,6 @@ public class RegistrationIntentService extends IntentService
         data.putString(Protocol.VALUE, token);
         data.putString(Protocol.ENTITY_ID, entityId);
 
-        int msgId = random.nextInt(10000000) + 1;
-
-        try
-        {
-            gcm.send(Protocol.CCS_SERVER_ENDPOINT, Integer.toString(msgId), data);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        GcmUtils.sendMessage(gcm, data);
     }
 }

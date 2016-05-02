@@ -17,6 +17,7 @@ import com.eyssyapps.fypcms.activities.common.TimetableChangeInfoActivity;
 import com.eyssyapps.fypcms.custom.TabbedWeekViewPager;
 import com.eyssyapps.fypcms.enumerations.TimetableType;
 import com.eyssyapps.fypcms.managers.PreferencesManager;
+import com.eyssyapps.fypcms.models.CancelledEvent;
 import com.eyssyapps.fypcms.models.IdTokenResponse;
 import com.eyssyapps.fypcms.models.RefreshTokenRequest;
 import com.eyssyapps.fypcms.models.StudentTimetable;
@@ -26,6 +27,8 @@ import com.eyssyapps.fypcms.services.RetrofitProviderService;
 import com.eyssyapps.fypcms.services.retrofit.AuthService;
 import com.eyssyapps.fypcms.services.retrofit.TimetableService;
 import com.eyssyapps.fypcms.utils.view.SystemMessagingUtils;
+
+import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -44,10 +47,11 @@ public class StudentTimetableActivity extends AppCompatActivity
 
     private Timetable timetable;
     private TabbedWeekViewPager tabbedWeekViewPager;
-    private int[] cancelledEventsIds,
-        newEventIds,
+    private int[] newEventIds,
         modifiedEventIds,
         removedEventIds;
+
+    private ArrayList<CancelledEvent> cancelledEvents;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -79,7 +83,14 @@ public class StudentTimetableActivity extends AppCompatActivity
         {
             if (extras.containsKey(Protocol.CANCELLED_EVENTS))
             {
-                cancelledEventsIds = extras.getIntArray(Protocol.CANCELLED_EVENTS);
+                int[] cancelledEventsIds = extras.getIntArray(Protocol.CANCELLED_EVENTS);
+                String timestamp = extras.getString(Protocol.TIMESTAMP);
+                String cancelledBy = extras.getString(Protocol.CANCELLED_BY);
+
+                for (int id : cancelledEventsIds)
+                {
+                    cancelledEvents.add(new CancelledEvent(id, timestamp, cancelledBy));
+                }
             }
             else if (extras.containsKey(Protocol.STANDARD_EVENT_CHANGE))
             {
@@ -242,7 +253,7 @@ public class StudentTimetableActivity extends AppCompatActivity
 
     private void showCancellations()
     {
-        if (cancelledEventsIds == null || cancelledEventsIds.length < 1)
+        if (cancelledEvents== null || cancelledEvents.size() < 1)
         {
             SystemMessagingUtils.showToast(this, "No changes to show", Toast.LENGTH_SHORT);
         }

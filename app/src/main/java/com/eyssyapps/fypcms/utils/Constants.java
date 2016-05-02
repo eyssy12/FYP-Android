@@ -23,6 +23,7 @@ public class Constants
     public static final String SECURITY_LOGOUT = "security_logout",
             SENT_TOKEN_TO_SERVER = "sent_token_to_server",
             REGISTRATION_COMPLETE = "registration_complete",
+            CLASS_CANCELLED = "class_cancelled",
             INSTANCE_ID = "instance_id",
             GCM_TOKEN = "gcm_token",
             SHARD_PREFERENCES_NAME = "com.eyssyapps.fypcms.gcmclient_preferences",

@@ -2,11 +2,13 @@ package com.eyssyapps.fypcms.adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.eyssyapps.fypcms.Protocol;
 import com.eyssyapps.fypcms.R;
 import com.eyssyapps.fypcms.enumerations.TimetableType;
 import com.eyssyapps.fypcms.models.Event;
@@ -95,12 +97,17 @@ public class EventRecyclerViewAdapter extends RecyclerViewAdapterBase<Event, Eve
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder
                             .setTitle("Choose action for selected event")
+                            .setIcon(R.drawable.classmates)
                             .setItems(items, new DialogInterface.OnClickListener() {
                                public void onClick(DialogInterface dialog, int which)
                                {
                                    if (which == 0)
                                    {
-                                       SystemMessagingUtils.showToast(context, "Cancelled " + item.getId(), Toast.LENGTH_SHORT);
+                                       Intent intent = new Intent();
+                                       intent.setAction(Constants.CLASS_CANCELLED);
+                                       intent.putExtra(Protocol.TIMETABLE_CHANGE_CANCELLED_EVENT_ID, item.getId());
+
+                                       context.sendBroadcast(intent);
                                    }
                                    else if (which == 1)
                                    {

@@ -1,7 +1,10 @@
 package com.eyssyapps.fypcms.activities.lecturer;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -11,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.eyssyapps.fypcms.Protocol;
 import com.eyssyapps.fypcms.R;
 import com.eyssyapps.fypcms.custom.TabbedWeekViewPager;
 import com.eyssyapps.fypcms.enumerations.TimetableType;
@@ -23,8 +27,13 @@ import com.eyssyapps.fypcms.models.WebApiArguments;
 import com.eyssyapps.fypcms.services.RetrofitProviderService;
 import com.eyssyapps.fypcms.services.retrofit.AuthService;
 import com.eyssyapps.fypcms.services.retrofit.TimetableService;
+import com.eyssyapps.fypcms.utils.Constants;
+import com.eyssyapps.fypcms.utils.networking.GcmUtils;
 import com.eyssyapps.fypcms.utils.view.SystemMessagingUtils;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import java.net.SocketTimeoutException;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
@@ -36,7 +45,11 @@ import retrofit2.Retrofit;
 
 public class LecturerTimetableActivity extends AppCompatActivity
 {
+    private BasicReceiver cancellationReceiver;
+    private IntentFilter intentFilter;
+
     private Retrofit retrofit;
+    private GoogleCloudMessaging gcm;
     private PreferencesManager sharedPreferences;
     private AuthService authService;
     private TimetableService timetableService;
@@ -61,6 +74,10 @@ public class LecturerTimetableActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        cancellationReceiver = new BasicReceiver();
+        intentFilter = new IntentFilter(Constants.CLASS_CANCELLED);
+        registerReceiver(cancellationReceiver, intentFilter);
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
@@ -74,6 +91,7 @@ public class LecturerTimetableActivity extends AppCompatActivity
             // this means we're arguments from the GcmListenerService
         }
 
+        gcm = GoogleCloudMessaging.getInstance(this);
         sharedPreferences = PreferencesManager.getInstance(this);
         retrofit = RetrofitProviderService.getDefaultInstance();
         authService = retrofit.create(AuthService.class);
@@ -88,16 +106,14 @@ public class LecturerTimetableActivity extends AppCompatActivity
         if (RetrofitProviderService.isTokenExpired(sharedPreferences))
         {
             String accessToken = sharedPreferences.getStringWithDefault(PreferencesManager.PREFS_DATA_ACCESS_TOKEN);
-            Call<IdTokenResponse> call = authService.refreshIdtoken(new RefreshTokenRequest(
-                    accessToken));
 
+            Call<IdTokenResponse> call = authService.refreshIdtoken(new RefreshTokenRequest(accessToken));
             call.enqueue(new Callback<IdTokenResponse>()
             {
                 @Override
                 public void onResponse(Call<IdTokenResponse> call, Response<IdTokenResponse> response)
                 {
-                    RetrofitProviderService.replaceIdTokenWithLatest(sharedPreferences,
-                            response.body());
+                    RetrofitProviderService.replaceIdTokenWithLatest(sharedPreferences,response.body());
 
                     fetchTimetable();
                 }
@@ -181,10 +197,26 @@ public class LecturerTimetableActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<List<Event>> call, Throwable t)
             {
-                // how to handle timeout ?
-                progressDialog.dismiss();
+                if (t instanceof SocketTimeoutException)
+                {
+                    progressDialog.setMessage("API is asleep, retrying...");
+
+                    fetchTimetable();
+                }
+                else
+                {
+                    progressDialog.dismiss();
+                }
             }
         });
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        unregisterReceiver(cancellationReceiver);
     }
 
     @Override
@@ -223,5 +255,32 @@ public class LecturerTimetableActivity extends AppCompatActivity
         setResult(RESULT_OK, intent);
 
         finish();
+    }
+
+    private class BasicReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context arg0, Intent arg1)
+        {
+            String action = arg1.getAction();
+
+            if (action.equals(Constants.CLASS_CANCELLED))
+            {
+                Bundle bundle = arg1.getExtras();
+
+                int eventId = bundle.getInt(Protocol.TIMETABLE_CHANGE_CANCELLED_EVENT_ID);
+                String entityId = sharedPreferences.getStringWithDefault(PreferencesManager.PREFS_DATA_ENTITY_ID);
+
+                String timestamp = Constants.DEFAULT_SIMPLE_DATE_FORMAT.format(new Date());
+
+                Bundle data = new Bundle();
+                data.putString(Protocol.ACTION, "event_cancelled");
+                data.putString(Protocol.VALUE, String.valueOf(eventId));
+                data.putString(Protocol.ENTITY_ID, entityId);
+                data.putString(Protocol.TIMESTAMP, timestamp);
+
+                GcmUtils.sendMessage(gcm, data);
+            }
+        }
     }
 }
