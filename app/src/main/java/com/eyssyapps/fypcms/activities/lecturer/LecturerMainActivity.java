@@ -393,6 +393,9 @@ public class LecturerMainActivity extends AppCompatActivity implements Navigatio
 
         switch (id)
         {
+            case R.id.nav_account:
+                SystemMessagingUtils.showToast(this, "Not supported in v1.0", Toast.LENGTH_SHORT);
+                break;
             case R.id.nav_modules:
                 startActivityForResult(LecturerModulesActivity.class, MODULES_START);
                 break;

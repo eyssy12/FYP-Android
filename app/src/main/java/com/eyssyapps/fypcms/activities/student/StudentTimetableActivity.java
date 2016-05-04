@@ -1,10 +1,12 @@
 package com.eyssyapps.fypcms.activities.student;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -13,7 +15,6 @@ import android.widget.Toast;
 
 import com.eyssyapps.fypcms.Protocol;
 import com.eyssyapps.fypcms.R;
-import com.eyssyapps.fypcms.activities.common.TimetableChangeInfoActivity;
 import com.eyssyapps.fypcms.custom.TabbedWeekViewPager;
 import com.eyssyapps.fypcms.enumerations.TimetableType;
 import com.eyssyapps.fypcms.managers.PreferencesManager;
@@ -26,9 +27,14 @@ import com.eyssyapps.fypcms.models.WebApiArguments;
 import com.eyssyapps.fypcms.services.RetrofitProviderService;
 import com.eyssyapps.fypcms.services.retrofit.AuthService;
 import com.eyssyapps.fypcms.services.retrofit.TimetableService;
+import com.eyssyapps.fypcms.utils.Constants;
 import com.eyssyapps.fypcms.utils.view.SystemMessagingUtils;
 
+import java.net.SocketTimeoutException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -51,7 +57,9 @@ public class StudentTimetableActivity extends AppCompatActivity
         modifiedEventIds,
         removedEventIds;
 
-    private ArrayList<CancelledEvent> cancelledEvents;
+    private List<CancelledEvent> cancelledEvents;
+
+    private boolean initialLoadFinished = false, timetableLoaded = false, cancelledEventsLoaded = false;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -78,6 +86,7 @@ public class StudentTimetableActivity extends AppCompatActivity
 
         // this means we're arguments from the GcmListenerService
         Bundle extras = getIntent().getExtras();
+        cancelledEvents = new ArrayList<>();
 
         if (extras != null)
         {
@@ -89,7 +98,7 @@ public class StudentTimetableActivity extends AppCompatActivity
 
                 for (int id : cancelledEventsIds)
                 {
-                    cancelledEvents.add(new CancelledEvent(id, timestamp, cancelledBy));
+                    cancelledEvents.add(new CancelledEvent(id, timestamp, cancelledBy, ""));
                 }
             }
             else if (extras.containsKey(Protocol.STANDARD_EVENT_CHANGE))
@@ -123,7 +132,7 @@ public class StudentTimetableActivity extends AppCompatActivity
                 {
                     RetrofitProviderService.replaceIdTokenWithLatest(sharedPreferences, response.body());
 
-                    fetchTimetable();
+                    fetchData();
                 }
 
                 @Override
@@ -137,8 +146,73 @@ public class StudentTimetableActivity extends AppCompatActivity
         }
         else
         {
-            fetchTimetable();
+            fetchData();
         }
+    }
+
+    private void fetchData()
+    {
+        fetchTimetable();
+        fetchCancelledEvents();
+    }
+
+    private void fetchCancelledEvents()
+    {
+        WebApiArguments arguments = RetrofitProviderService.getStandardWebApiArguments(sharedPreferences);
+
+        Call<List<CancelledEvent>> call = timetableService.getCancelledEventsForStudent(arguments.getUserId(), arguments.getAuthorizedBearer());
+        call.enqueue(new Callback<List<CancelledEvent>>()
+        {
+            @Override
+            public void onResponse(Call<List<CancelledEvent>> call, Response<List<CancelledEvent>> response)
+            {
+                if (RetrofitProviderService.checkOk(response))
+                {
+                    cancelledEvents = response.body();
+
+                    reportCancelledEventsLoaded();
+                }
+                else if (RetrofitProviderService.checkNewTokenRequired(response))
+                {
+                    String accessToken = sharedPreferences.getStringWithDefault(PreferencesManager.PREFS_DATA_ACCESS_TOKEN);
+                    // need to get a new token
+                    Call<IdTokenResponse> refreshCall = authService.refreshIdtoken(new RefreshTokenRequest(accessToken));
+                    refreshCall.enqueue(new Callback<IdTokenResponse>()
+                    {
+                        @Override
+                        public void onResponse(Call<IdTokenResponse> call, Response<IdTokenResponse> response)
+                        {
+                            RetrofitProviderService.replaceIdTokenWithLatest(sharedPreferences, response.body());
+
+                            fetchCancelledEvents();
+                        }
+
+                        @Override
+                        public void onFailure(Call<IdTokenResponse> call, Throwable t)
+                        {
+                            SystemMessagingUtils.showToast(
+                                StudentTimetableActivity.this,
+                                "There is a problem with the service and requires you to re-authenticate yourself.",
+                                Toast.LENGTH_SHORT);
+
+                            setResult(RESULT_CANCELED);
+                            finish();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<CancelledEvent>> call, Throwable t)
+            {
+                if (t instanceof SocketTimeoutException)
+                {
+                    progressDialog.setMessage("API is asleep, retrying...");
+
+                    fetchCancelledEvents();
+                }
+            }
+        });
     }
 
     private void fetchTimetable()
@@ -155,11 +229,7 @@ public class StudentTimetableActivity extends AppCompatActivity
                 {
                     timetable = response.body();
 
-                    if (timetable.getEvents().isEmpty())
-                    {
-                        SystemMessagingUtils.createSnackbar(tabbedWeekViewPager.getViewPager(), "Timetable retrieved - no classes have been configured", Snackbar.LENGTH_SHORT).show();
-                    }
-                    else
+                    if (timetable != null && !timetable.getEvents().isEmpty())
                     {
                         tabbedWeekViewPager.getMondayAdapter().replaceCollection(timetable.getMondayEvents(), true);
                         tabbedWeekViewPager.getTuesdayAdapter().replaceCollection(timetable.getTuesdayEvents(), true);
@@ -170,7 +240,7 @@ public class StudentTimetableActivity extends AppCompatActivity
                         SystemMessagingUtils.createSnackbar(tabbedWeekViewPager.getViewPager(), "Timetable retrieved", Snackbar.LENGTH_SHORT).show();
                     }
 
-                    progressDialog.dismiss();
+                    reportTimetableLoaded();
                 }
                 else if (RetrofitProviderService.checkNewTokenRequired(response))
                 {
@@ -205,7 +275,12 @@ public class StudentTimetableActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<StudentTimetable> call, Throwable t)
             {
-                progressDialog.dismiss();
+                if (t instanceof SocketTimeoutException)
+                {
+                    progressDialog.setMessage("API is asleep, retrying...");
+
+                    fetchTimetable();
+                }
             }
         });
     }
@@ -253,15 +328,94 @@ public class StudentTimetableActivity extends AppCompatActivity
 
     private void showCancellations()
     {
-        if (cancelledEvents== null || cancelledEvents.size() < 1)
+        if (cancelledEvents == null || cancelledEvents.size() < 1)
         {
-            SystemMessagingUtils.showToast(this, "No changes to show", Toast.LENGTH_SHORT);
+            SystemMessagingUtils.showToast(this, "No cancellations to show", Toast.LENGTH_SHORT);
         }
         else
         {
-            Intent intent = new Intent(this, TimetableChangeInfoActivity.class);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder
+                .setTitle("Cancelled classes")
+                .setIcon(R.drawable.timetable_event_cancelled)
+                .setCancelable(true)
+                .setItems(prepareCancelledEventsForAlertDialog(), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
 
-            startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Dismiss", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
+        }
+    }
+
+    private String[] prepareCancelledEventsForAlertDialog()
+    {
+        String[] items = new String[cancelledEvents.size()];
+
+        int index = 0;
+        for (CancelledEvent cancelledEvent : cancelledEvents)
+        {
+            try
+            {
+                Date date = Constants.DEFAULT_SIMPLE_DATE_FORMAT.parse(cancelledEvent.getTimestamp());
+                String cancellationTimestamp = Constants.DEFAULT_NEWS_POST_SIMPLE_DATE_FORMAT.format(date);
+
+                String formatted =
+                    "\n-> " +
+                    cancelledEvent.getCancelledEventTitle() + " " +
+                    cancelledEvent.getFormattedStartAndEndDate() +
+                    "\nBy: " + cancelledEvent.getCancelledBy() +
+                    "\nOn: " + cancellationTimestamp;
+
+                items[index] = formatted;
+
+                index++;
+            }
+            catch (ParseException e)
+            {
+                e.printStackTrace();
+                break;
+            }
+        }
+
+        return items;
+    }
+
+    private void reportTimetableLoaded()
+    {
+        timetableLoaded = true;
+
+        checkLoadingStatus();
+    }
+
+    private void reportCancelledEventsLoaded()
+    {
+        cancelledEventsLoaded = true;
+
+        checkLoadingStatus();
+    }
+
+    private void checkLoadingStatus()
+    {
+        if (!initialLoadFinished && (timetableLoaded && cancelledEventsLoaded))
+        {
+            progressDialog.dismiss();
+
+            SystemMessagingUtils.showSnackBar(
+                coordinatorLayout,
+                "Timetable loaded",
+                Toast.LENGTH_SHORT);
+
+            initialLoadFinished = true;
         }
     }
 }

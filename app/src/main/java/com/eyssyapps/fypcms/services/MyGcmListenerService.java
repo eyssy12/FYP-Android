@@ -62,25 +62,30 @@ public class MyGcmListenerService extends GcmListenerService
 
         if (action.equals(Protocol.EVENT_CANCELLED))
         {
-            int eventId = Integer.valueOf(data.getString(Protocol.VALUE));
-            String timestamp = data.getString(Protocol.TIMESTAMP);
-            String cancelledBy = data.getString(Protocol.CANCELLED_BY);
-            String message = "A class has been cancelled!";
-
-            Intent intent = new Intent(this, StudentTimetableActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.putExtra(Protocol.STANDARD_EVENT_CHANGE, false);
-            intent.putExtra(Protocol.CANCELLED_EVENTS, new int[] { eventId });
-            intent.putExtra(Protocol.TIMESTAMP, timestamp);
-            intent.putExtra(Protocol.CANCELLED_BY, cancelledBy);
-
-            displayNotification(
-                "Timetable updated",
-                message,
-                intent,
-                StudentMainActivity.TIMETABLE_START,
-                TIMETABLE_NOTIFICATION_ID);
+            prepareEventCancellationFromMobileClient(data);
         }
+    }
+
+    private void prepareEventCancellationFromMobileClient(Bundle data)
+    {
+        int eventId = Integer.valueOf(data.getString(Protocol.VALUE));
+        String timestamp = data.getString(Protocol.TIMESTAMP);
+        String cancelledBy = data.getString(Protocol.CANCELLED_BY);
+        String message = "A class has been cancelled!";
+
+        Intent intent = new Intent(this, StudentTimetableActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(Protocol.STANDARD_EVENT_CHANGE, false);
+        intent.putExtra(Protocol.CANCELLED_EVENTS, new int[] { eventId });
+        intent.putExtra(Protocol.TIMESTAMP, timestamp);
+        intent.putExtra(Protocol.CANCELLED_BY, cancelledBy);
+
+        displayNotification(
+            "Timetable updated",
+            message,
+            intent,
+            StudentMainActivity.TIMETABLE_START,
+            TIMETABLE_NOTIFICATION_ID);
     }
 
     private void handleHttpMessage(Bundle data)
@@ -99,7 +104,7 @@ public class MyGcmListenerService extends GcmListenerService
             }
             else if (json.has(Protocol.TIMETABLE_CHANGE_CANCELLED_EVENTS))
             {
-                handleTimetableEventCancelations(json);
+                handleTimetableEventCancellations(json);
             }
         }
         else
@@ -131,7 +136,7 @@ public class MyGcmListenerService extends GcmListenerService
             .setAutoCancel(true)
             .setPriority(Notification.PRIORITY_MAX)
             .setLights(0xff0000ff, 600, 600)
-            .setSmallIcon(R.drawable.timetable)
+            .setSmallIcon(R.drawable.timetable_white)
             .setSound(defaultSoundUri)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentIntent(pendingIntent);
@@ -146,8 +151,7 @@ public class MyGcmListenerService extends GcmListenerService
         JsonObject timetableChange = json.get(Protocol.TIMETABLE_CHANGE).getAsJsonObject();
 
         JsonArray modifiedEvents = timetableChange.get(Protocol.MODIFIED_EVENTS).getAsJsonArray();
-        int[] modifiedEventIds = JsonUtils.getIntegerArrayFromJsonArray(
-                modifiedEvents);
+        int[] modifiedEventIds = JsonUtils.getIntegerArrayFromJsonArray( modifiedEvents);
 
         JsonArray newEvents = timetableChange.get(Protocol.NEW_EVENTS).getAsJsonArray();
         int[] newEventIds = JsonUtils.getIntegerArrayFromJsonArray(newEvents);
@@ -183,7 +187,7 @@ public class MyGcmListenerService extends GcmListenerService
                 TIMETABLE_NOTIFICATION_ID);
     }
 
-    protected void handleTimetableEventCancelations(JsonObject json)
+    protected void handleTimetableEventCancellations(JsonObject json)
     {
         JsonObject changes = json.get(Protocol.TIMETABLE_CHANGE_CANCELLED_EVENTS).getAsJsonObject();
 

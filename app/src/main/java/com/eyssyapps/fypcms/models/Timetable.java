@@ -16,7 +16,6 @@ public abstract class Timetable
 
     public Timetable(List<Event> events)
     {
-
         this.events = events;
     }
 
@@ -34,6 +33,11 @@ public abstract class Timetable
 
     public List<Event> getEvents()
     {
+        if (events == null)
+        {
+            return new ArrayList<>();
+        }
+
         return events;
     }
 
@@ -60,6 +64,19 @@ public abstract class Timetable
     public List<Event> getFridayEvents()
     {
         return this.filterByDayOfWeek(Calendar.FRIDAY);
+    }
+
+    public Event getEventById(int id)
+    {
+        for (Event event : events)
+        {
+            if (event.getId() == id)
+            {
+                return event;
+            }
+        }
+
+        return null;
     }
 
     private List<Event> filterByDayOfWeek(int dayOfWeek)

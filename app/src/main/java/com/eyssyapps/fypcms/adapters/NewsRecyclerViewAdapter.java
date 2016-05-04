@@ -1,14 +1,17 @@
 package com.eyssyapps.fypcms.adapters;
 
 import android.content.Context;
-import android.support.design.widget.Snackbar;
+import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.eyssyapps.fypcms.R;
+import com.eyssyapps.fypcms.activities.common.ReadNewsPostActivity;
 import com.eyssyapps.fypcms.models.NewsPost;
 import com.eyssyapps.fypcms.models.viewholders.NewsItemViewHolder;
-import com.eyssyapps.fypcms.utils.view.SystemMessagingUtils;
 
 /**
  * Created by eyssy on 06/04/2016.
@@ -33,25 +36,42 @@ public class NewsRecyclerViewAdapter extends RecyclerViewAdapterBase<NewsPost, N
     {
         final NewsPost item = items.get(position);
 
-        // TODO: should only display max 6-10 lines, give an onclick listener to expand the text or to show a dialog with the full text
-
         // TODO: figure out how to handle youtube/image/media clip arts
-//        URLImageParser parser = new URLImageParser(holder.bodyText, context);
-//        Spanned htmlText = Html.fromHtml(item.getBody(), parser, null);
-
-//        Spanned spanned = Html.fromHtml(item.getBody(), null, new MyTagHandler());
-//
-//        holder.getBodyText().setText(spanned);
         holder.getTitleText().setText(item.getTitle());
         holder.getPostedByText().setText(item.getPostedBy());
         holder.getTimestampText().setText(item.getTimestamp());
-        holder.getWebView().loadDataWithBaseURL("", item.getBody(), "text/html", "UTF-8", "");
 
-        holder.getWebView().setOnClickListener(new View.OnClickListener() {
+        holder.getReadMore().setOnTouchListener(new View.OnTouchListener()
+        {
             @Override
-            public void onClick(View v)
+            public boolean onTouch(View v, MotionEvent event)
             {
-                SystemMessagingUtils.showSnackBar(parentView, "webview", Snackbar.LENGTH_SHORT);
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        ImageView view = (ImageView) v;
+                        //overlay is black with transparency of 0x77 (119)
+                        view.getDrawable().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                        view.invalidate();
+
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL: {
+                        ImageView view = (ImageView) v;
+                        //clear the overlay
+                        view.getDrawable().clearColorFilter();
+                        view.invalidate();
+
+                        Intent intent = new Intent(context, ReadNewsPostActivity.class);
+                        intent.putExtra(ReadNewsPostActivity.WEBVIEW_CONTENT, item.getBody());
+
+                        context.startActivity(intent);
+
+                        break;
+                    }
+                }
+
+                return true;
             }
         });
     }

@@ -1,9 +1,8 @@
 package com.eyssyapps.fypcms.models.viewholders;
 
-import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eyssyapps.fypcms.R;
@@ -13,9 +12,8 @@ import com.eyssyapps.fypcms.R;
  */
 public class NewsItemViewHolder extends RecyclerView.ViewHolder
 {
-    private TextView titleText, bodyText, timestampText, postedByText;
-
-    private WebView webView;
+    private TextView titleText, timestampText, postedByText;
+    private ImageView readMore;
 
     public NewsItemViewHolder(View itemView)
     {
@@ -24,28 +22,17 @@ public class NewsItemViewHolder extends RecyclerView.ViewHolder
         titleText = (TextView) itemView.findViewById(R.id.newspost_title);
         timestampText = (TextView) itemView.findViewById(R.id.newspost_timestamp);
         postedByText = (TextView) itemView.findViewById(R.id.newspost_postedBy);
+        readMore = (ImageView) itemView.findViewById(R.id.read_more);
+    }
 
-        webView = (WebView)itemView.findViewById(R.id.newspost_webview_body);
-
-        if (Build.VERSION.SDK_INT >= 19)
-        {
-            // chromium, enable hardware acceleration
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-        } else
-        {
-            // older android version, disable hardware acceleration
-            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
+    public ImageView getReadMore()
+    {
+        return readMore;
     }
 
     public TextView getTitleText()
     {
         return titleText;
-    }
-
-    public TextView getBodyText()
-    {
-        return bodyText;
     }
 
     public TextView getTimestampText()
@@ -56,10 +43,5 @@ public class NewsItemViewHolder extends RecyclerView.ViewHolder
     public TextView getPostedByText()
     {
         return postedByText;
-    }
-
-    public WebView getWebView()
-    {
-        return webView;
     }
 }

@@ -68,6 +68,18 @@ public abstract class RecyclerViewAdapterBase<T, VH extends RecyclerView.ViewHol
         return true;
     }
 
+    public boolean remove(T item)
+    {
+        if (items.contains(item))
+        {
+            items.remove(item);
+            refresh();
+            return true;
+        }
+
+        return false;
+    }
+
     public void addNewCollection(List<T> collection, boolean immediateRefresh)
     {
         items.clear();
@@ -113,18 +125,6 @@ public abstract class RecyclerViewAdapterBase<T, VH extends RecyclerView.ViewHol
     {
         items.clear();
         refresh();
-    }
-
-    public boolean remove(String item)
-    {
-        if (items.contains(item))
-        {
-            items.remove(item);
-            refresh();
-            return true;
-        }
-
-        return false;
     }
 
     public void refresh()

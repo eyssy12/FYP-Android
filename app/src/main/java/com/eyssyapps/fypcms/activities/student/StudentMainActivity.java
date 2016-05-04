@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import com.eyssyapps.fypcms.R;
 import com.eyssyapps.fypcms.activities.LoginActivity;
-import com.eyssyapps.fypcms.activities.SendMessageActivity;
 import com.eyssyapps.fypcms.adapters.NewsRecyclerViewAdapter;
 import com.eyssyapps.fypcms.custom.EmptyRecyclerView;
 import com.eyssyapps.fypcms.managers.PreferencesManager;
@@ -330,16 +329,11 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
             @Override
             public void onFailure(Call<StudentPerson> call, Throwable t)
             {
-
                 if (t instanceof SocketTimeoutException)
                 {
                     progressDialog.setMessage("API is asleep, retrying...");
 
-                    fetchNews();
-                }
-                else
-                {
-                    swipeRefreshLayout.setRefreshing(false);
+                    fetchStudent();
                 }
             }
         });
@@ -376,9 +370,8 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         switch (id)
         {
             case R.id.nav_account:
-                // show the account settings here
                 // startActivityForResult(StudentAccountSettingsActivity.class, ACCOUNT_SETTINGS_START);
-                SystemMessagingUtils.showToast(this, "Future work implementation", Toast.LENGTH_SHORT);
+                SystemMessagingUtils.showToast(this, "Not supported in v1.0", Toast.LENGTH_SHORT);
                 break;
             case R.id.nav_classmates:
                 startActivityForResult(StudentClassmatesActivity.class, CLASSMATES_START);
@@ -418,12 +411,12 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         {
             case R.id.action_settings:
                 return true;
-            case R.id.reset_shared_preferences:
-                clearSharedPreferences();
-                return true;
-            case R.id.send_message_activity:
-                startActivityForResult(SendMessageActivity.class, SEND_MESSAGE_START);
-                return true;
+//            case R.id.reset_shared_preferences:
+//                clearSharedPreferences();
+//                return true;
+//            case R.id.send_message_activity:
+//                startActivityForResult(SendMessageActivity.class, SEND_MESSAGE_START);
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

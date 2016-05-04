@@ -16,12 +16,12 @@ import com.eyssyapps.fypcms.Protocol;
 import com.eyssyapps.fypcms.R;
 import com.eyssyapps.fypcms.activities.lecturer.LecturerMainActivity;
 import com.eyssyapps.fypcms.activities.student.StudentMainActivity;
-import com.eyssyapps.fypcms.services.retrofit.AuthService;
 import com.eyssyapps.fypcms.managers.PreferencesManager;
 import com.eyssyapps.fypcms.models.AuthRequest;
 import com.eyssyapps.fypcms.models.TokenData;
 import com.eyssyapps.fypcms.models.User;
 import com.eyssyapps.fypcms.services.RetrofitProviderService;
+import com.eyssyapps.fypcms.services.retrofit.AuthService;
 import com.eyssyapps.fypcms.utils.Constants;
 import com.eyssyapps.fypcms.utils.data.JsonUtils;
 import com.eyssyapps.fypcms.utils.view.SystemMessagingUtils;
@@ -234,7 +234,7 @@ public class LoginActivity extends AppCompatActivity
                             this.usernameText.getText().toString(),
                             this.passwordText.getText().toString()));
 
-            // enqueue indicates that it will be an async operations
+            // enqueue indicates that it will be an async operation
             call.enqueue(new Callback<ResponseBody>()
             {
                 @Override

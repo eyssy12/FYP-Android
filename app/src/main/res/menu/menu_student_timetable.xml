@@ -5,7 +5,7 @@
     <item
         android:id="@+id/action_cancellations"
         android:orderInCategory="100"
-        android:icon="@android:drawable/ic_popup_reminder"
+        android:icon="@drawable/timetable_event_cancelled_inverted"
         android:title="@string/action_refresh"
         app:showAsAction="always"/>
     <item

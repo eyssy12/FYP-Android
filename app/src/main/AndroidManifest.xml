@@ -132,8 +132,8 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activities.common.TimetableChangeInfoActivity"
-            android:label="@string/title_activity_timetable_change_info"
+            android:name=".activities.common.ReadNewsPostActivity"
+            android:label="@string/title_activity_read_news_post"
             android:theme="@style/Theme.AppCompat.Light.Dialog">
         </activity>
     </application>

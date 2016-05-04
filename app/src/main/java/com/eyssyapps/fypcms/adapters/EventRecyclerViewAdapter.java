@@ -96,8 +96,8 @@ public class EventRecyclerViewAdapter extends RecyclerViewAdapterBase<Event, Eve
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder
-                            .setTitle("Choose action for selected event")
-                            .setIcon(R.drawable.classmates)
+                            .setTitle("Select action for event")
+                            .setIcon(R.drawable.options)
                             .setItems(items, new DialogInterface.OnClickListener() {
                                public void onClick(DialogInterface dialog, int which)
                                {

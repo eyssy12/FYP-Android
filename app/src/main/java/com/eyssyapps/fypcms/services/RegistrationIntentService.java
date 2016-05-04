@@ -84,9 +84,6 @@ public class RegistrationIntentService extends IntentService
 
             checkRegistrationRequirements(token, isReRegistration, isTokenSentToServer);
 
-            // Subscribe to topic channels
-            // subscribeTopics(token);
-
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
