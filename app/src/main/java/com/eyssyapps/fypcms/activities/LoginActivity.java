@@ -229,10 +229,9 @@ public class LoginActivity extends AppCompatActivity
             //https://www.metachris.com/2015/10/retrofit-2-samples/
             AuthService service = retrofit.create(AuthService.class);
 
-            Call<ResponseBody> call = service.authenticate(
-                    new AuthRequest(
-                            this.usernameText.getText().toString(),
-                            this.passwordText.getText().toString()));
+            Call<ResponseBody> call = service.authenticate(new AuthRequest(
+                this.usernameText.getText().toString(),
+                this.passwordText.getText().toString()));
 
             // enqueue indicates that it will be an async operation
             call.enqueue(new Callback<ResponseBody>()
@@ -254,7 +253,6 @@ public class LoginActivity extends AppCompatActivity
                             String bodyData = response.body().string();
 
                             JsonObject jsonObject = JsonUtils.asJsonObject(bodyData);
-
                             boolean authenticated = jsonObject.get(Protocol.AUTHENTICATED).getAsBoolean();
                             if (authenticated)
                             {
@@ -295,7 +293,7 @@ public class LoginActivity extends AppCompatActivity
                     }
                     catch (IOException e)
                     {
-                        SystemMessagingUtils.createToast(
+                        SystemMessagingUtils.showToast(
                             LoginActivity.this,
                             "There is a problem with the login service.",
                             Toast.LENGTH_SHORT);

@@ -271,13 +271,13 @@ public class LecturerTimetableActivity extends AppCompatActivity
 
                 int eventId = bundle.getInt(Protocol.TIMETABLE_CHANGE_CANCELLED_EVENT_ID);
                 String entityId = sharedPreferences.getStringWithDefault(PreferencesManager.PREFS_DATA_ENTITY_ID);
-                String timestamp = Constants.DEFAULT_SIMPLE_DATE_FORMAT.format(new Date());
+                Date now = new Date();
 
                 Bundle data = new Bundle();
                 data.putString(Protocol.ACTION, Protocol.EVENT_CANCELLED);
                 data.putString(Protocol.VALUE, String.valueOf(eventId));
                 data.putString(Protocol.ENTITY_ID, entityId);
-                data.putString(Protocol.TIMESTAMP, timestamp);
+                data.putString(Protocol.TIMESTAMP, String.valueOf(now.getTime()));
 
                 GcmUtils.sendMessage(gcm, data);
             }

@@ -411,12 +411,6 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         {
             case R.id.action_settings:
                 return true;
-//            case R.id.reset_shared_preferences:
-//                clearSharedPreferences();
-//                return true;
-//            case R.id.send_message_activity:
-//                startActivityForResult(SendMessageActivity.class, SEND_MESSAGE_START);
-//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -476,21 +470,6 @@ public class StudentMainActivity extends AppCompatActivity implements Navigation
         startActivity(new Intent(StudentMainActivity.this, LoginActivity.class));
 
         finish();
-    }
-
-    // TODO: remove this once done with the main code
-    private void clearSharedPreferences()
-    {
-        try
-        {
-            sharedPreferences.clear();
-
-            Toast.makeText(StudentMainActivity.this, "Shared preferences cleared!", Toast.LENGTH_SHORT).show();
-        }
-        catch (Exception ex)
-        {
-            Toast.makeText(StudentMainActivity.this, "Couldnt clear shared preferences", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void reportNewsLoaded()

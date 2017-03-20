@@ -54,20 +54,8 @@ public class RetrofitProviderService
     {
         if (retrofit == null)
         {
-            // 2016-03-08T00:00:00
-
-//            Gson gson = new GsonBuilder()
-//                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//                .create();
-
             ArrayList<Converter.Factory> factories = new ArrayList<>();
             factories.add(GsonConverterFactory.create());
-            //factories.add(GsonConverterFactory.create(gson));
-
-//          // intention here might be to add a longer timeout just for the demo day
-//            final OkHttpClient okHttpClient = new OkHttpClient();
-//            okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
-//            okHttpClient.setConnectTimeout(60, TimeUnit.SECONDS);
 
             initializeRetrofit(Constants.API_BASE, factories);
         }

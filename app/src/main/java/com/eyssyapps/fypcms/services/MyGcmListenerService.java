@@ -26,16 +26,8 @@ public class MyGcmListenerService extends GcmListenerService
 {
     private static final String TAG = "MyGcmListenerService";
     private Random random = new Random(System.currentTimeMillis());
-
     private static final int TIMETABLE_NOTIFICATION_ID = 100;
 
-    /**
-     * Called when message is received.
-     *
-     * @param from SenderID of the sender.
-     * @param data Data bundle containing message data as key/value pairs.
-     *             For Set of keys use data.keySet().
-     */
     @Override
     public void onMessageReceived(String from, Bundle data)
     {
@@ -149,13 +141,10 @@ public class MyGcmListenerService extends GcmListenerService
     protected void handleTimetableChanges(JsonObject json)
     {
         JsonObject timetableChange = json.get(Protocol.TIMETABLE_CHANGE).getAsJsonObject();
-
         JsonArray modifiedEvents = timetableChange.get(Protocol.MODIFIED_EVENTS).getAsJsonArray();
         int[] modifiedEventIds = JsonUtils.getIntegerArrayFromJsonArray( modifiedEvents);
-
         JsonArray newEvents = timetableChange.get(Protocol.NEW_EVENTS).getAsJsonArray();
         int[] newEventIds = JsonUtils.getIntegerArrayFromJsonArray(newEvents);
-
         JsonArray removedEvents = timetableChange.get(Protocol.REMOVED_EVENTS).getAsJsonArray();
         int[] removedEventIds = JsonUtils.getIntegerArrayFromJsonArray(removedEvents);
 
@@ -167,9 +156,7 @@ public class MyGcmListenerService extends GcmListenerService
         intent.putExtra(Protocol.REMOVED_EVENTS, removedEventIds);
 
         int changeAmount = modifiedEventIds.length + newEventIds.length + removedEventIds.length;
-
         String message;
-
         if (changeAmount > 1)
         {
             message = "There are " + changeAmount + " changes made to your timetable!";
@@ -180,20 +167,18 @@ public class MyGcmListenerService extends GcmListenerService
         }
 
         displayNotification(
-                "Timetable updated",
-                message,
-                intent,
-                StudentMainActivity.TIMETABLE_START,
-                TIMETABLE_NOTIFICATION_ID);
+            "Timetable updated",
+            message,
+            intent,
+            StudentMainActivity.TIMETABLE_START,
+            TIMETABLE_NOTIFICATION_ID);
     }
 
     protected void handleTimetableEventCancellations(JsonObject json)
     {
         JsonObject changes = json.get(Protocol.TIMETABLE_CHANGE_CANCELLED_EVENTS).getAsJsonObject();
-
         JsonArray cancelledEvents = changes.get(Protocol.CANCELLED_EVENTS).getAsJsonArray();
         int[] cancelledEventIds = JsonUtils.getIntegerArrayFromJsonArray(cancelledEvents);
-
         String message;
         if (cancelledEventIds.length > 1)
         {

@@ -20,7 +20,6 @@ import java.util.Random;
 public class RegistrationIntentService extends IntentService
 {
     private static final String TAG = "RegIntentService";
-    private static final String[] TOPICS = {"global"};
 
     private GoogleCloudMessaging gcm;
     private PreferencesManager sharedPreferences;
@@ -29,7 +28,6 @@ public class RegistrationIntentService extends IntentService
     public RegistrationIntentService()
     {
         super(TAG);
-
         this.gcm = GoogleCloudMessaging.getInstance(this);
         this.sharedPreferences = PreferencesManager.getInstance(this);
         this.random = new Random();
@@ -127,14 +125,6 @@ public class RegistrationIntentService extends IntentService
         }
     }
 
-    /**
-     * Persist registration to third-party servers.
-     *
-     * Modify this method to associate the user's GCM registration token with any server-side account
-     * maintained by your application.
-     *
-     * @param token The new token.
-     */
     private void sendRegistrationToServer(String token, String action, String entityId)
     {
         // Add custom implementation, as needed.

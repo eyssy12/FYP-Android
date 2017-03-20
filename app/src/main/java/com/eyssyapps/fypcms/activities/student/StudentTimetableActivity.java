@@ -406,7 +406,7 @@ public class StudentTimetableActivity extends AppCompatActivity
 
     private void checkLoadingStatus()
     {
-        if (!initialLoadFinished && (timetableLoaded && cancelledEventsLoaded))
+        if (initialLoadFinished || (timetableLoaded && cancelledEventsLoaded))
         {
             progressDialog.dismiss();
 

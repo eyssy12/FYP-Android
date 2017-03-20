@@ -86,7 +86,7 @@ public class CancelledEvent
 
             String dayOfWeek = Constants.DAYS_OF_WEEK.get(calendar.get(Calendar.DAY_OF_WEEK) - 1);
 
-            formatted = "(" + dayOfWeek + " " + Constants.DEFAULT_EVENT_DISPLAY_SIMPLE_DATE_FORMAT.format(start) + " - " + Constants.DEFAULT_EVENT_DISPLAY_SIMPLE_DATE_FORMAT.format(end) +")";
+            formatted = "(" + dayOfWeek + " " + Constants.DEFAULT_EVENT_DISPLAY_SIMPLE_DATE_FORMAT.format(start) + " - " + Constants.DEFAULT_EVENT_DISPLAY_SIMPLE_DATE_FORMAT.format(end) + ")";
         }
         catch (ParseException e)
         {
