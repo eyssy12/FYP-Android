@@ -5,16 +5,12 @@ This application acts as the client that allows the user to make use of features
 
 Some of the dependencies are:
 
-[Retrofit](http://square.github.io/retrofit/) - for Web requests
+* [Retrofit](http://square.github.io/retrofit/) - for Web requests
 
+* [Butterknife](http://jakewharton.github.io/butterknife/) - for injecting R.id resources (using Java annotations)
 
-[Butterknife](http://jakewharton.github.io/butterknife/) - for injecting R.id resources (using Java annotations)
+* Google Support Libraries
 
+* Google Cloud Messaging (GCM)
 
-Google Support Libraries
-
-
-Google Cloud Messaging (GCM)
-
-
-[GSON](https://github.com/google/gson) - for Json processing
+* [GSON](https://github.com/google/gson) - for Json processing
